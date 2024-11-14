@@ -21,6 +21,8 @@ import matplotlib.pyplot as plt
 # 2) Downloading data
 #-----------------------------------------------------------------------------------------------------------------------------
 
+#The datasets contain daily data of selected assets for 5 years in various timeframes
+
 #BND stands for Vanguard Total Bond Market ETF (bonds ETF)
 BND = pd.read_csv("BND ETF Stock Price History.csv", parse_dates=['Date'], index_col='Date')
 #GBP_USD stands for British Pound Sterling / US Dollar (FX)
@@ -95,14 +97,19 @@ plt.show()
 #-----------------------------------------------------------------------------------------------------------------------------
 
 #BND statistics
+print("BND statistics")
 print(BND['Price'].describe())
 #GBP_USD statistics
+print("GBP_USD statistics")
 print(GBP_USD['Price'].describe())
 #MSFT statistics
+print("MSFT statistics")
 print(MSFT['Price'].describe())
 #ND100 statistics
+print("ND100 statistics")
 print(ND100['Price'].describe())
 #NG statistics
+print("NG statistics")
 print(NG['Price'].describe())
 
 # %%
@@ -128,7 +135,7 @@ print(NG['Price'].describe())
 #Lastly this strategy can have limitations in markets where there are no clear trends present
 
 #define strategy function
-def trend_following_strategy(data, price_column, short_window=20, long_window=50):
+def trend_following_strategy(data, price_column, short_window=10, long_window=50):
     
     #data load
     df = data
@@ -176,5 +183,87 @@ results_GBP_USD = trend_following_strategy(data=GBP_USD, price_column='Price')
 results_MSFT = trend_following_strategy(data=MSFT, price_column='Price')
 results_ND100 = trend_following_strategy(data=ND100, price_column='Price')
 results_NG = trend_following_strategy(data=NG, price_column='Price')
+
+# %%
+#-----------------------------------------------------------------------------------------------------------------------------
+# 6) Testing performance
+#-----------------------------------------------------------------------------------------------------------------------------
+
+#define testing performance function
+def calculate_performance(df, price_column='Price'):
+
+    #daily returns
+    df['Return'] = df[price_column].pct_change()
+    
+    #variables for strategy performance
+    position = 0  # 1 for holding position and 0 for not holding
+    entry_price = 0
+    df['Strategy_Return'] = 0
+
+    for i in range(1, len(df)):
+        if df['Position'].iloc[i] == 1:  #Buy signal
+            position = 1
+            entry_price = df[price_column].iloc[i]
+        elif df['Position'].iloc[i] == -1 and position == 1:  #Sell signal
+            position = 0
+            #return for the holding period
+            df['Strategy_Return'].iloc[i] = (df[price_column].iloc[i] - entry_price) / entry_price
+
+    #cumulative returns
+    df['Cumulative_Strategy_Return'] = (1 + df['Strategy_Return']).cumprod() - 1
+
+    #Sharpe Ratio (taking the assumption of risk-free rate of 0%)
+    sharpe_ratio = np.sqrt(252) * df['Strategy_Return'].mean() / df['Strategy_Return'].std()
+
+    #Maximum Drawdown
+    cumulative_return = (1 + df['Strategy_Return']).cumprod()
+    drawdown = (cumulative_return / cumulative_return.cummax()) - 1
+    max_drawdown = drawdown.min()
+    
+    #Win Rate
+    trades = df[df['Strategy_Return'] != 0]
+    win_rate = len(trades[trades['Return'] > 0]) / len(trades) if len(trades) > 0 else 0
+
+    #save performance metrics
+    performance_metrics = {
+        'Sharpe Ratio': sharpe_ratio,
+        'Maximum Drawdown': max_drawdown,
+        'Win Rate': win_rate
+    }
+    metrics_df = pd.DataFrame([performance_metrics])
+
+    #results
+    print(f"Sharpe Ratio: {sharpe_ratio:.2f}")
+    print(f"Maximum Drawdown: {max_drawdown:.2%}")
+    print(f"Win Rate: {win_rate:.2%}")
+    
+    #visualize cumulative returns
+    plt.figure(figsize=(12, 6))
+    plt.plot(df.index, df['Cumulative_Strategy_Return'], label='Cumulative Strategy Return')
+    plt.title('Cumulative Returns of Moving Average Strategy')
+    plt.xlabel('Date')
+    plt.ylabel('Cumulative Return')
+    plt.grid(True)
+    plt.legend()
+    plt.show()
+    
+    return df, metrics_df
+
+
+#results with performance per each asset
+results_BND = trend_following_strategy(data=BND, price_column='Price')
+performance_BND, metrics_BND = calculate_performance(results_BND, price_column='Price')
+
+results_GBP_USD = trend_following_strategy(data=GBP_USD, price_column='Price')
+performance_GBP_USD, metrics_GBP_USD = calculate_performance(results_GBP_USD, price_column='Price')
+
+results_MSFT = trend_following_strategy(data=MSFT, price_column='Price')
+performance_MSFT, metrics_MSFT = calculate_performance(results_MSFT, price_column='Price')
+
+results_ND100 = trend_following_strategy(data=ND100, price_column='Price')
+performance_ND100, metrics_ND100 = calculate_performance(results_ND100, price_column='Price')
+
+results_NG = trend_following_strategy(data=NG, price_column='Price')
+performance_NG, metrics_NG = calculate_performance(results_NG, price_column='Price')
 
 # %%
