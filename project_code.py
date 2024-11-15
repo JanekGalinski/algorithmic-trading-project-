@@ -266,4 +266,64 @@ performance_ND100, metrics_ND100 = calculate_performance(results_ND100, price_co
 results_NG = trend_following_strategy(data=NG, price_column='Price')
 performance_NG, metrics_NG = calculate_performance(results_NG, price_column='Price')
 
+
+# %%
+#-----------------------------------------------------------------------------------------------------------------------------
+# 7) Visualizing performance metrics
+#-----------------------------------------------------------------------------------------------------------------------------
+
+#BND metrics
+print("BND metrics")
+print(metrics_BND)
+#GBP_USD metrics
+print("GBP_USD metrics")
+print(metrics_GBP_USD)
+#MSFT metrics
+print("MSFT metrics")
+print(metrics_MSFT)
+#ND100 metrics
+print("ND100 metrics")
+print(metrics_ND100)
+#NG metrics
+print("NG metrics")
+print(metrics_NG)
+
+#add ticker (name) column
+metrics_BND['Ticker'] = 'BND'
+metrics_GBP_USD['Ticker'] = 'GBP_USD'
+metrics_MSFT['Ticker'] = 'MSFT'
+metrics_ND100['Ticker'] = 'ND100'
+metrics_NG['Ticker'] = 'NG'
+
+#combine all metrics dataframes
+combined_metrics = pd.concat([metrics_BND, metrics_GBP_USD, metrics_MSFT, metrics_ND100, metrics_NG], ignore_index=True)
+
+#'Ticker' column as index
+combined_metrics.set_index('Ticker', inplace=True)
+
+#plot Sharpe Ratio
+plt.figure(figsize=(14, 8))
+combined_metrics['Sharpe Ratio'].plot(kind='bar', color='skyblue')
+plt.title('Sharpe Ratio Comparison')
+plt.ylabel('Sharpe Ratio')
+plt.grid(axis='y')
+plt.show()
+
+#plot Maximum Drawdown
+plt.figure(figsize=(14, 8))
+combined_metrics['Maximum Drawdown'].plot(kind='bar', color='salmon')
+plt.title('Maximum Drawdown Comparison')
+plt.ylabel('Max Drawdown')
+plt.grid(axis='y')
+plt.show()
+
+#plot Win Rate
+plt.figure(figsize=(14, 8))
+combined_metrics['Win Rate'].plot(kind='bar', color='lightgreen')
+plt.title('Win Rate Comparison')
+plt.ylabel('Win Rate')
+plt.grid(axis='y')
+plt.show()
+
+
 # %%
