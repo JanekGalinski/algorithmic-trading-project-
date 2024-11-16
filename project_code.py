@@ -327,3 +327,42 @@ plt.show()
 
 
 # %%
+#-----------------------------------------------------------------------------------------------------------------------------
+# 8) Conclusions
+#-----------------------------------------------------------------------------------------------------------------------------
+
+#After comparing different time windows results:
+#The selected short term moving average (MA) window is 10 days
+#The selected long term moving average (MA) window is 50 days
+
+#Looking at the results of performance metrics:
+#Sharpe ratio
+#Sharpe ratio values with this strategy are the highest for BND and are positive
+#For the rest of assets the values are negative
+#It indicates that in general for bonds the strategy is at most suboptimal, when comparing returns to risk level
+#What is more for remaining assets (FX, stocks, index and future) this suggests that the strategy is underperforming the risk free asset in terms of returns
+
+#Maximum Drawdown
+#The maximum drawdown varies among assets much
+#The highest values was for NG, 2nd for MSFT and 3rd for ND100
+#The smallest value was for BND
+#For stock, index and future the values exceeded 0.3 even up to more than 0.5 indicating very high risk strategy for those assets
+#For FX the drawdown was about 0.1 suggesting moderate risk when taking into account active investing
+#Finally for bonds the values were slighly lowr than 0.05 indicating relatively low risk and small volatility of strategy
+
+#Win Rate
+#The win rates highly differ among assets
+#The highest values is for BND, 2nd for ND100 and 3rd for MSFT
+#The lowest rate is for GBP_USD
+#However for none of the assets strategy provided higher than 50% of win rate
+#These results suggest that strategy in general did not provided high win rate
+#It is important to remember that it does not mean that strategy necceserily provided losses
+#Trend following strategy can still be profitable when taking multiple small losses and few big trades with high positive returns
+
+#Taking those results into consideration it can be concluded that the strategy did not perform very vell among all assets
+#The best asset to be considered for this strategy would be bonds, which is also supported by looking at cumulative returns
+#The worst assets to be selected for this strategy would be stocks or futures 
+
+#Future condsiderations
+#It might be interesting to include much longer timeperiods of data in future research to smooth the short term volatilities
+#It can be worth to also investigate different not trend following strategies to provide better returns for those selected assets
